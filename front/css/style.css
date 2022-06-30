@@ -130,7 +130,7 @@ main {
 	display: flex;
 	justify-content: space-around;
 	flex-wrap: wrap;
-}
+	}
 .items a {
 	width: 21%;
 	text-decoration: none;

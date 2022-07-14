@@ -4,6 +4,8 @@ let urlParams = new URLSearchParams(location.search);
 let URLid = urlParams.get('id');
 //console.log(URLid)
 
+
+
 fetch('http://localhost:3000/api/products/' + URLid)
 
   .then(function (res) {
@@ -32,12 +34,12 @@ fetch('http://localhost:3000/api/products/' + URLid)
     price.innerHTML = data.price;
     const description = document.getElementById("description");
     description.innerHTML = data.description;
-/*
-    for (let palette in data.colors) {
-      console.log(data.colors[palette])
-
-    }
-*/
+    /*
+        for (let palette in data.colors) {
+          console.log(data.colors[palette])
+    
+        }
+    */
     for (let color of data.colors) {
       const select = document.getElementById('colors');
       const option = document.createElement("option");
@@ -47,8 +49,53 @@ fetch('http://localhost:3000/api/products/' + URLid)
 
     }
 
-  })
+    //bouton "addToCart"
 
+    const addToCart_btn = document.getElementById("addToCart");
+
+    //listen
+    addToCart_btn.addEventListener('click', (e) => {
+      (e).preventDefault();
+
+      //récupérer les données de couleur et qte
+
+      let selectedColor = document.getElementById("colors").value;
+      let qte = document.getElementById("quantity").value;
+
+      //canapé choisi
+      let selection = {
+        id: data._id,
+        option: selectedColor,
+        quantité: qte,
+
+      }
+      console.log(selection)
+
+      //gestion du localstorage
+
+
+      //déclarer la variable "panier" où on stocke les keys("product") et values("selection") qui sont dans localstorage
+
+      let panier = JSON.parse(localStorage.getItem("product"));
+
+      //s'il y a déjà des "product": écrase par nouvelles valeures
+      if (panier) {
+        panier.push(selection);
+        localStorage.product = JSON.stringify(panier);
+
+      }
+
+      //s'il n'y a pas de product; créer l'array "panier"
+      else {
+        panier = [];
+        panier.push(selection);
+        localStorage.product = JSON.stringify(panier);
+
+      }
+
+    })
+
+  })
 
   .catch(function (err) {
     console.error("intervention de catch: il y a une erreur")

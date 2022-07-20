@@ -1,14 +1,22 @@
+//renomage de la page
+document.title = "Kanap |  Votre panier";
 
-//testes de récupération des données et localstorage
-console.log(localStorage.product);
+//////////////////////////////////////////////////
+
+let addSousTotal = [];
+
+
+
+console.log(addSousTotal)
+
+
 
 
 //récupération des données "product"
-let objLinea = localStorage.product;
-let panier = JSON.parse(objLinea);
-
+let productsinStorage = localStorage.product;
+let panier = JSON.parse(productsinStorage);
 console.log(panier);
-console.log("id du 2e article  " + panier[1].id);
+console.log(panier.length)
 
 
 // Pour chaque produit dans le panier
@@ -19,7 +27,6 @@ for (i = 0; i < panier.length; i++) {
 
 
     //récupérer les données complémentaires de "selection" via fetch pour éviter de saturer localhost
-
     fetch("http://localhost:3000/api/products/" + id)
 
         .then(function (res) {
@@ -28,19 +35,34 @@ for (i = 0; i < panier.length; i++) {
             }
         })
 
+
         //traitement des données productdata pour créer les balises
+
+
 
         .then(productdata => {
 
-            //console.table(productdata);
-            for (let produit in panier) {
+            //Affichage si panier vide
+            if (panier === null || panier.length === 0) {
+
+                const empty_section = document.getElementById("cart__items");
+                const empty_cart = document.createElement("h2")
+                empty_cart.innerHTML = "Le panier est vide";
+                empty_section.appendChild(empty_cart)
+            }
+            else {
+                //si le panier n'est pas vide creation des cart article
+
                 const section = document.getElementById("cart__items");
 
                 const article = document.createElement("article")
-
                 article.classList.add("cart__item");
-                article.dataset.id = "{id}";
-                article.dataset.color = "{color}";
+
+
+                article.setAttribute('data-id', id);
+                article.setAttribute('data-color', color);
+
+
                 section.appendChild(article)
 
                 const div_img = document.createElement("div");
@@ -80,18 +102,77 @@ for (i = 0; i < panier.length; i++) {
                 div_description.classList.add("cart__item__content__settings__quantity");
                 div_settings.appendChild(div_quantity)
 
-                const p_qté = document.createElement("p")
+                const p_qté = document.createElement("p");
                 p_qté.innerHTML = "Qté : " + qté;
                 div_quantity.appendChild(p_qté)
 
+
+
+
+
+
+
+
+
+
             }
+            
+            let sousTotal = qté * productdata.price;
+            console.log(sousTotal)
+
+
+            addSousTotal.push(sousTotal);
+
+
+            console.log(addSousTotal)
+
+
+
+            //créer tableau où on met tous les prix grace à getelementby. Reduce?
+
+
+
+
+
+            const reducer = (accumulator, currentValue) => accumulator + currentValue;
+            const prixTotal = addSousTotal.reduce(reducer, 0);
+
+            console.log(prixTotal)
+
 
         })
 
 
-        .catch(function (err) {
-            console.error("intervention de catch: il y a une erreur")
-        
-          })
 
-}      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    
+            })
+    
+            .catch(function (err) {
+                console.error("intervention de catch: il y a une erreur")
+    */
+
+
+
+
+
+}
+
+
+
+
+

@@ -30,10 +30,6 @@ fetch('http://localhost:3000/api/products/' + URLid)
     const description = document.getElementById("description");
     description.innerHTML = data.description;
 
-
-
-
-
     //renseignement des options de couleur
     for (let color of data.colors) {
       const select = document.getElementById('colors');
@@ -45,7 +41,7 @@ fetch('http://localhost:3000/api/products/' + URLid)
     }
 
     //sous total
-    //ajouter un effezt refresh page ou onchang?
+    //ajouter un effet refresh page ou onchang?
     const div_icsq = document.getElementsByClassName("item__content__settings__quantity")[0];
     const sstt = document.createElement("h2")
     sstt.innerHTML = " Sous total : " + data.price * document.getElementById("quantity").value + "€";
@@ -56,28 +52,37 @@ fetch('http://localhost:3000/api/products/' + URLid)
 
     const addToCart_btn = document.getElementById("addToCart");
 
-
-
-
-
     //listen
     addToCart_btn.addEventListener('click', (e) => {
       (e).preventDefault();
 
       //récupérer les données de couleur et qte
       let selectedColor = document.getElementById("colors").value;
-      let qte = document.getElementById("quantity").value;
+      //let qte = document.getElementById("quantity").value; ATTENTION LE PIEGE!
+      let qte = parseInt(document.getElementById("quantity").value);
+
+      //obliger le visiteur à choisir des quantité et couleurs valides
+      if (
+        qte == 0 ||
+        qte > 100 ||
+        selectedColor == null ||
+        selectedColor == ''
+      ) {
+        alert("Veuillez selectionner une couleur et une quantité comprise entre 1 et 100");
+        return;
+      }
 
       //canapé choisi
       let selection = {
         id: data._id,
         option: selectedColor,
         quantité: qte,
+        px : data.price,
 
       }
       console.log(selection)
 
-      //gestion du localstorage
+      ///////////////////////////////////////////////////////gestion du localstorage
 
       let lsCart = localStorage.getItem("product");
 
@@ -95,9 +100,9 @@ fetch('http://localhost:3000/api/products/' + URLid)
         // Si c'est le cas (if)
         if (product.id === selection.id && product.option === selection.option) {
           //    je lève le drapeau (trouvé = true)
-          let foundFlag = true
+          foundFlag = true
           //    Je modifie la quantité dans la panier
-          product.qte += qte
+          product.quantité += qte
         }
         // Sinon (else) je passe à l'objet suivant
       }
@@ -108,90 +113,27 @@ fetch('http://localhost:3000/api/products/' + URLid)
         panier.push(selection);
       }
       // Dans tous les cas on remet le panier dans le storage
-      //localStorage.product = JSON.stringify(panier);
+      localStorage.product = JSON.stringify(panier);
       //Vérifier la syntaxe
-      localStorage.setItem("product", JSON.stringify(panier));
+      //localStorage.setItem("product", JSON.stringify(panier));
 
-
-
-
-      //si panier existe: ajouter selections
-      //si panier existe pas: le créer
-
-
-      /*
-            //initialise le panier
-            let panier = JSON.parse(localStorage.getItem("product"));
-            console.log(panier)
-            //si panier existe: ajouter selections
-            if (panier !== null) {
+//reload à voir
+      location.reload();
+      return false;
       
-      
-              if (panier.id == selection.id && panier.option == selection.option && panier.quantité != qte) {
-      
-                product.quantité += qte;
-      
-              }
-      
-              panier.push(selection);
-      
-            }
-            //si panier existe pas: le créer
-            else {
-              panier = [];
-              panier.push(selection);
-              // 
-      
-            }
-      
-      
-            localStorage.product = JSON.stringify(panier);
-      
-      */
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      // })
-
-
-
-
-
-
-
-    })
-
-    /*
-    .catch(function (err) {
-      console.error("intervention de catch: il y a une erreur")
      
+
+
+
     })
-    */
+   
   })
+  .catch(function (err) {
+    console.error("intervention de catch: il y a une erreur")
+
+  })
+
+  

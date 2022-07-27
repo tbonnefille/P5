@@ -1,4 +1,3 @@
-
 //récupération de id dans l'URL via urlParams.get
 let urlParams = new URLSearchParams(location.search);
 let URLid = urlParams.get('id');
@@ -40,15 +39,21 @@ fetch('http://localhost:3000/api/products/' + URLid)
 
     }
 
+    //oninput pour calcul du sous otal en temps réel
+    let inputQty = document.querySelector("input");
+    inputQty.oninput = function () {
+      sstt.innerHTML = "sous total : " + inputQty.value * data.price + "€";
+    };
+
     //sous total
-    //ajouter un effet refresh page ou onchang?
     const div_icsq = document.getElementsByClassName("item__content__settings__quantity")[0];
     const sstt = document.createElement("h2")
     sstt.innerHTML = " Sous total : " + data.price * document.getElementById("quantity").value + "€";
     div_icsq.appendChild(sstt);
 
+    //////////////////////////////////////////////
 
-    //bouton "addToCart"
+    //
 
     const addToCart_btn = document.getElementById("addToCart");
 
@@ -67,29 +72,31 @@ fetch('http://localhost:3000/api/products/' + URLid)
         qte > 100 ||
         selectedColor == null ||
         selectedColor == ''
-      ) {
+      )
+       {
         alert("Veuillez selectionner une couleur et une quantité comprise entre 1 et 100");
         return;
-      }
+      };
 
       //canapé choisi
       let selection = {
         id: data._id,
         option: selectedColor,
-        quantité: qte,
-        px : data.price,
+        quantité: qte
 
       }
       console.log(selection)
 
-      ///////////////////////////////////////////////////////gestion du localstorage
+      ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
 
       let lsCart = localStorage.getItem("product");
 
       if (!lsCart) {
-        lsCart = '[]';
+        lsCart = [];
       }
-      let panier = JSON.parse(lsCart);
+
+      let panier = JSON.parse(localStorage.getItem('product'));
+
       console.log(panier)
       // Créer un drapeau "trouvé" à false
       let foundFlag = false
@@ -102,38 +109,38 @@ fetch('http://localhost:3000/api/products/' + URLid)
           //    je lève le drapeau (trouvé = true)
           foundFlag = true
           //    Je modifie la quantité dans la panier
-          product.quantité += qte
+          product.quantité += qte;
         }
         // Sinon (else) je passe à l'objet suivant
       }
+
       // Après la boucle je regarde le drapeau
       // Si le drapeau n'est pas levé (false) c'est que je n'ai pas l'objet dans le panier
       if (foundFlag == false) {
+
         // => je l'ajoute
         panier.push(selection);
+
       }
+
       // Dans tous les cas on remet le panier dans le storage
       localStorage.product = JSON.stringify(panier);
       //Vérifier la syntaxe
       //localStorage.setItem("product", JSON.stringify(panier));
 
-//reload à voir
-      location.reload();
-      return false;
-      
 
 
 
-     
+
+
 
 
 
     })
-   
+    /*
+      })
+      .catch(function (err) {
+        console.error("intervention de catch: il y a une erreur")
+    */
   })
-  .catch(function (err) {
-    console.error("intervention de catch: il y a une erreur")
 
-  })
-
-  

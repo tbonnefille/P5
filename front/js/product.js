@@ -51,9 +51,8 @@ fetch('http://localhost:3000/api/products/' + URLid)
     sstt.innerHTML = " Sous total : " + data.price * document.getElementById("quantity").value + "€";
     div_icsq.appendChild(sstt);
 
-    //////////////////////////////////////////////
+    //////////////////////////////////////////////addToCart///////////////////////////////////////////////////////////////
 
-    //
 
     const addToCart_btn = document.getElementById("addToCart");
 
@@ -89,14 +88,13 @@ fetch('http://localhost:3000/api/products/' + URLid)
 
       ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
 
+      
       let lsCart = localStorage.getItem("product");
 
       if (!lsCart) {
-        lsCart = [];
+        lsCart = '[]';
       }
-
-      let panier = JSON.parse(localStorage.getItem('product'));
-
+      let panier = JSON.parse(lsCart);
       console.log(panier)
       // Créer un drapeau "trouvé" à false
       let foundFlag = false
@@ -109,30 +107,19 @@ fetch('http://localhost:3000/api/products/' + URLid)
           //    je lève le drapeau (trouvé = true)
           foundFlag = true
           //    Je modifie la quantité dans la panier
-          product.quantité += qte;
+          product.quantité += qte
         }
         // Sinon (else) je passe à l'objet suivant
       }
-
       // Après la boucle je regarde le drapeau
       // Si le drapeau n'est pas levé (false) c'est que je n'ai pas l'objet dans le panier
       if (foundFlag == false) {
-
         // => je l'ajoute
         panier.push(selection);
-
       }
-
       // Dans tous les cas on remet le panier dans le storage
       localStorage.product = JSON.stringify(panier);
-      //Vérifier la syntaxe
-      //localStorage.setItem("product", JSON.stringify(panier));
-
-
-
-
-
-
+      
 
 
 

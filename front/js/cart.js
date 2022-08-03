@@ -1,10 +1,10 @@
-//renomage de la page
+// Renomage de la page
 document.title = "Kanap |  Votre panier";
 
-//tableau des sous totaux
+// Tableau des sous totaux
 let tableauDesSSTT = [];
 
-//récupération des données "product"
+// Récupération des données "product"
 let lsCart = localStorage.product;
 if (lsCart == null) {
     // JSON.parse a besoin d'une string en paramètre
@@ -137,7 +137,7 @@ for (let i = 0; i < cart.length; i++) {
                 }
             });
 
-            // Calcul du prix total via reducer(somme des sous totaux) et affichage
+            // Calcul du prix total via reducer(somme des sous totaux) et affichage par article
             const reducer = (accumulator, currentValue) => accumulator + currentValue;
             const prixTotal = tableauDesSSTT.reduce(reducer, 0);
             console.log(prixTotal)
@@ -167,7 +167,7 @@ for (let i = 0; i < cart.length; i++) {
 
         })
 
-    //Calcul de la quantité globale et du prix total
+    // Calcul de la quantité globale et du prix total
     function calcQty() {
         let eltQuantity = document.getElementsByClassName('itemQuantity');
         let totalQuantitySelect = 0;
@@ -218,3 +218,136 @@ for (let i = 0; i < cart.length; i++) {
 //////////////////////////////Gestion du formulaire
 
 
+// Etablir les RegEx(expressions régulières) pour définir le type de caractères utilisés dans les champs et le format
+let nameRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç ,.'-]+$");
+let addressRegex = new RegExp('^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+');
+let emailRegex = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
+
+// Tests de validation des champs du formulaire
+let firstName = document.getElementById('firstName');
+firstName.placeholder = "John";
+firstName.addEventListener('input', function (e) {
+    e.preventDefault();
+    // Le test trouve des caractères non compris dans le RegEx
+    if (nameRegex.test(firstName.value) === false) {
+        let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+        firstNameErrorMsg.innerHTML = "Le format du prénom est  incorrect";
+        firstNameErrorMsg.style.color = 'crimson';
+        firstNameErrorMsg.style.fontWeight = 'bold';
+        // Tous les caractère sont dans les limites du RegEX
+    } else {
+        document.getElementById('firstNameErrorMsg').innerHTML = '';
+    }
+});
+
+let lastName = document.getElementById('lastName');
+lastName.placeholder = "Doe";
+lastName.addEventListener('input', function (e) {
+    e.preventDefault();
+    if (nameRegex.test(lastName.value) === false) {
+        let lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
+        lastNameErrorMsg.innerHTML = "Le format du nom est incorrect";
+        lastNameErrorMsg.style.color = 'crimson';
+        lastNameErrorMsg.style.fontWeight = 'bold';
+    } else {
+        document.getElementById('lastNameErrorMsg').innerHTML = "";
+    }
+});
+
+let address = document.getElementById('address');
+address.placeholder = "1,rue de la Paix"
+address.addEventListener('input', function (e) {
+    e.preventDefault();
+    if (addressRegex.test(address.value) === false) {
+        let addressErrorMsg = document.getElementById('addressErrorMsg');
+        addressErrorMsg.innerHTML = "Le format de l'adresse est incorrect";
+        addressErrorMsg.style.color = 'crimson';
+        addressErrorMsg.style.fontWeight = 'bold';
+    } else {
+        document.getElementById('addressErrorMsg').innerHTML = "";
+    }
+});
+
+let city = document.getElementById('city');
+city.placeholder = "Paris";
+city.addEventListener('input', function (e) {
+    e.preventDefault();
+    if (nameRegex.test(city.value) === false) {
+        let cityErrorMsg = document.getElementById('cityErrorMsg');
+        cityErrorMsg.innerHTML = "Le format du nom de la ville est incorrect";
+        cityErrorMsg.style.color = 'crimson';
+        cityErrorMsg.style.fontWeight = 'bold';
+    } else {
+        document.getElementById('cityErrorMsg').innerHTML = "";
+    }
+});
+
+let email = document.getElementById('email');
+email.placeholder = "john_doe@exemple.com"
+city.addEventListener('input', function (e) {
+    e.preventDefault();
+    if (emailRegex.test(email.value) === false) {
+        let emailErrorMsg = document.getElementById('emailErrorMsg');
+        emailErrorMsg.innerHTML = "Le format de l'email est incorrect";
+        emailErrorMsg.style.color = 'crimson';
+        emailErrorMsg.style.fontWeight = 'bold';
+    } else {
+        document.getElementById('emailErrorMsg').innerHTML = "";
+    }
+});
+
+
+// Communiquer avec l'API
+
+const btn_commander = document.getElementById("order");
+
+// envoi des infos
+btn_commander.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // Constituer un objet contact
+    const objetContact = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        address: address.value,
+        city: city.value,
+        email: email.value,
+
+    }
+
+    console.log(objetContact)
+
+    // un tableau de produits.
+    let orderCart = [];
+    for (let i = 0; i < cart.length; i++) {
+        orderCart.push(cart[i]);
+    }
+    console.log(orderCart)
+
+
+    // Objet contenant les infos à envoyer(contact+tableau)
+
+    let order = {
+        objetContact: objetContact,
+        orderCart: orderCart,
+    }
+
+    // soumettre l'objet order
+    const options = {
+        method: 'POST',
+        
+        headers: {
+           'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(order)
+    };
+
+    fetch('http://localhost:3000/api/products/order', options)
+        .then((res) => {
+            return res.json();
+        })
+        .then((data) => {
+            console.log(data)
+        })
+})

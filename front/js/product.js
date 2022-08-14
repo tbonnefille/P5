@@ -1,8 +1,8 @@
 // Récupération de id dans l'URL via urlParams.get
 let urlParams = new URLSearchParams(location.search);
-let URLid = urlParams.get('id');
+let urlId = urlParams.get('id');
 
-fetch('http://localhost:3000/api/products/' + URLid)
+fetch('http://localhost:3000/api/products/' + urlId)
 
   .then(function (res) {
     if (res.ok) {
@@ -61,13 +61,16 @@ fetch('http://localhost:3000/api/products/' + URLid)
 
       // Récupérer les données de couleur et qte
       let selectedColor = document.getElementById("colors").value;
-      //let qte = document.getElementById("quantity").value; ATTENTION LE PIEGE!
+      // ATTENTION: nous voulons une valeur et pas une string
       let qty = parseInt(document.getElementById("quantity").value);
 
       // Obliger le visiteur à choisir des quantité et couleurs valides
       if (
-        qty == 0 ||
-        qty > 100 ||
+       // qty == 0 ||
+        //qty > 100 ||
+        qty == NaN ||
+       // qty == null ||
+       // sstt.innerHTML == 0 ||
         selectedColor == null ||
         selectedColor == ''
       ) {
@@ -82,7 +85,6 @@ fetch('http://localhost:3000/api/products/' + URLid)
         quantité: qty
 
       }
-      console.log(selection);
 
       ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
 

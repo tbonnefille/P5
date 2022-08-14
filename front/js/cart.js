@@ -12,7 +12,6 @@ if (lsCart == null) {
 }
 let cart = JSON.parse(lsCart);
 console.log(cart);
-console.log("lenght of cart: " + cart.length);
 // Signaler qu'il n'y a rien dans le panier 
 if (cart.length == 0) {
     const empty_section = document.getElementById("cart__items");
@@ -37,10 +36,10 @@ for (let i = 0; i < cart.length; i++) {
                 return res.json();
             }
         })
-        /* .catch(function (err) {
-             console.error("intervention de catch: il y a une erreur")
-     
-         })*/
+        .catch(function (err) {
+            console.error("intervention de catch: il y a une erreur")
+
+        })
         // Traitement des données productdata pour créer les balises
         .then(productdata => {
 
@@ -230,9 +229,9 @@ firstName.addEventListener('input', function (e) {
     e.preventDefault();
     // Le test trouve des caractères non compris dans le RegEx
     if (nameRegex.test(firstName.value) === false) {
-        let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
-        firstNameErrorMsg.innerHTML = "Le format du prénom est  incorrect";
-        firstNameErrorMsg.style.color = 'crimson';
+        let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+        firstNameErrorMsg.innerHTML = "Le format du prénom est incorrect";
+        firstNameErrorMsg.style.color = 'red';
         firstNameErrorMsg.style.fontWeight = 'bold';
         // Tous les caractère sont dans les limites du RegEX
     } else {
@@ -247,7 +246,7 @@ lastName.addEventListener('input', function (e) {
     if (nameRegex.test(lastName.value) === false) {
         let lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
         lastNameErrorMsg.innerHTML = "Le format du nom est incorrect";
-        lastNameErrorMsg.style.color = 'crimson';
+        lastNameErrorMsg.style.color = 'red';
         lastNameErrorMsg.style.fontWeight = 'bold';
     } else {
         document.getElementById('lastNameErrorMsg').innerHTML = "";
@@ -261,7 +260,7 @@ address.addEventListener('input', function (e) {
     if (addressRegex.test(address.value) === false) {
         let addressErrorMsg = document.getElementById('addressErrorMsg');
         addressErrorMsg.innerHTML = "Le format de l'adresse est incorrect";
-        addressErrorMsg.style.color = 'crimson';
+        addressErrorMsg.style.color = 'red';
         addressErrorMsg.style.fontWeight = 'bold';
     } else {
         document.getElementById('addressErrorMsg').innerHTML = "";
@@ -275,7 +274,7 @@ city.addEventListener('input', function (e) {
     if (nameRegex.test(city.value) === false) {
         let cityErrorMsg = document.getElementById('cityErrorMsg');
         cityErrorMsg.innerHTML = "Le format du nom de la ville est incorrect";
-        cityErrorMsg.style.color = 'crimson';
+        cityErrorMsg.style.color = 'red';
         cityErrorMsg.style.fontWeight = 'bold';
     } else {
         document.getElementById('cityErrorMsg').innerHTML = "";
@@ -284,70 +283,85 @@ city.addEventListener('input', function (e) {
 
 let email = document.getElementById('email');
 email.placeholder = "john_doe@exemple.com"
-city.addEventListener('input', function (e) {
+email.addEventListener('input', function (e) {
     e.preventDefault();
     if (emailRegex.test(email.value) === false) {
         let emailErrorMsg = document.getElementById('emailErrorMsg');
         emailErrorMsg.innerHTML = "Le format de l'email est incorrect";
-        emailErrorMsg.style.color = 'crimson';
+        emailErrorMsg.style.color = 'red';
         emailErrorMsg.style.fontWeight = 'bold';
     } else {
         document.getElementById('emailErrorMsg').innerHTML = "";
     }
 });
 
-
 // Communiquer avec l'API
-
 const btn_commander = document.getElementById("order");
 
 // envoi des infos
 btn_commander.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // Constituer un objet contact
-    const objetContact = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        address: address.value,
-        city: city.value,
-        email: email.value,
-
+    //test de validité de la commande(panier + formulaire)
+    if (cart.length == 0) {
+        alert(
+            'Votre panier est vide, veuillez sélectionner un article pour passer une commande'
+        );
+        return;
     }
 
-    console.log(objetContact)
+    else if (
+        !nameRegex.test(firstName.value) ||
+        !nameRegex.test(lastName.value) ||
+        !emailRegex.test(email.value) ||
+        !nameRegex.test(city.value) ||
+        !addressRegex.test(address.value)
+    ) {
+        alert('Veuillez remplir correctement tous les champs du formulaire');
+        return;
+    }
 
-    // un tableau de produits.
-    let orderCart = [];
+    // Tableau des Id
+    let productId = [];
     for (let i = 0; i < cart.length; i++) {
-        orderCart.push(cart[i]);
+        productId.push(cart[i].id);
     }
-    console.log(orderCart)
+    console.log(productId)
 
-
-    // Objet contenant les infos à envoyer(contact+tableau)
-
+    // Objet à envoyer au bon format
     let order = {
-        objetContact: objetContact,
-        orderCart: orderCart,
-    }
-
-    // soumettre l'objet order
+        contact: {
+            firstName: firstName.value,
+            lastName: lastName.value,
+            address: address.value,
+            city: city.value,
+            email: email.value,
+        },
+        products: productId,
+    };
+    // Envoi de order au serveur via POST
     const options = {
         method: 'POST',
-        
+        body: JSON.stringify(order),
         headers: {
-           'Accept': 'application/json',
-            'Content-Type': 'application/json;charset=utf-8'
+            Accept: 'application/json',
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(order)
     };
-
+    // Récupération de orderId
     fetch('http://localhost:3000/api/products/order', options)
         .then((res) => {
             return res.json();
         })
         .then((data) => {
-            console.log(data)
+            const orderId = data.orderId;
+            console.table(data)
+            // Renvoi de l'orderId dans l'URL de confirmation.html
+            document.location.href = "confirmation.html?id=" + data.orderId;
+
         })
-})
+        .catch(function (err) {
+            console.error("intervention de catch: il y a une erreur")
+        });
+}
+);

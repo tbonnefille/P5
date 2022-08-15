@@ -3,9 +3,9 @@ let urlParams = new URLSearchParams(location.search);
 let orderId = urlParams.get("id");
 
 // Affichage de orderId
- const confirmation = document.getElementById("orderId");
- confirmation.innerHTML = orderId;
- confirmation.style.color = "red";
- 
+const confirmation = document.getElementById("orderId");
+confirmation.innerHTML = orderId;
+confirmation.style.color = "red";
+
 // Effacement des données stockées dans le localStorage
-//localStorage.removeItem("product");
+localStorage.removeItem("product");

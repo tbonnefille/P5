@@ -214,7 +214,7 @@ for (let i = 0; i < cart.length; i++) {
 
 }
 
-//////////////////////////////Gestion du formulaire
+///////////////////////////////////Gestion du formulaire////////////////////////////////////////////////////////////
 
 
 // Etablir les RegEx(expressions régulières) pour définir le type de caractères utilisés dans les champs et le format
@@ -305,7 +305,7 @@ btn_commander.addEventListener("click", (e) => {
     //test de validité de la commande(panier + formulaire)
     if (cart.length == 0) {
         alert(
-            'Votre panier est vide, veuillez sélectionner un article pour passer une commande'
+            'Votre panier est vide. Veuillez sélectionner au moins un article pour passer une commande'
         );
         return;
     }

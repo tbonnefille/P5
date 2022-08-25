@@ -21,14 +21,12 @@ fetch('http://localhost:3000/api/products/' + urlId)
     img.src = data.imageUrl;
     img.alt = data.altTxt;
     div.appendChild(img);
-
     const h1 = document.getElementById("title");
     h1.innerHTML = data.name;
     const price = document.getElementById("price");
     price.innerHTML = data.price;
     const description = document.getElementById("description");
     description.innerHTML = data.description;
-
     // Renseignement des options de couleur
     for (let color of data.colors) {
       const select = document.getElementById('colors');
@@ -38,13 +36,11 @@ fetch('http://localhost:3000/api/products/' + urlId)
       select.appendChild(option);
 
     }
-
     // Oninput pour calcul du sous total en temps réel
     let inputQty = document.querySelector("input");
     inputQty.oninput = function () {
       sstt.innerHTML = "sous total : " + inputQty.value * data.price + "€";
     };
-
     // Affichage du sous total
     const div_icsq = document.getElementsByClassName("item__content__settings__quantity")[0];
     const sstt = document.createElement("h2");
@@ -54,30 +50,29 @@ fetch('http://localhost:3000/api/products/' + urlId)
     //////////////////////////////////////////////addToCart///////////////////////////////////////////////////////////////
 
     const addToCart_btn = document.getElementById("addToCart");
-
     // Validation listen
     addToCart_btn.addEventListener('click', (e) => {
       (e).preventDefault();
-
       // Récupérer les données de couleur et qte
       let selectedColor = document.getElementById("colors").value;
       // ATTENTION: nous voulons une valeur et pas une string
-      let qty = parseInt(document.getElementById("quantity").value);
 
+      let qty = parseInt(document.getElementById("quantity").value);
+      //const qtyString = document.getElementById("quantity").value;
+//let qty = parseInt(qtyString);
       // Obliger le visiteur à choisir des quantité et couleurs valides
       if (
-       // qty == 0 ||
-        //qty > 100 ||
+        //! qty.match("/^[0-9]*$/g") ||
         qty == NaN ||
-       // qty == null ||
-       // sstt.innerHTML == 0 ||
+        qty == "" ||
+        qty <= 0 ||
+        qty > 100 ||
         selectedColor == null ||
-        selectedColor == ''
+        selectedColor == ""
       ) {
         alert("Veuillez selectionner une couleur et une quantité comprise entre 1 et 100");
         return;
       };
-
       // Canapé choisi
       let selection = {
         id: data._id,
@@ -85,7 +80,6 @@ fetch('http://localhost:3000/api/products/' + urlId)
         quantité: qty
 
       }
-
       ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
 
       let lsCart = localStorage.getItem("product");

@@ -1,9 +1,7 @@
 // Renomage de la page
 document.title = "Kanap |  Votre panier";
-
 // Tableau des sous totaux
 let tableauDesSSTT = [];
-
 // Récupération des données "product"
 let lsCart = localStorage.product;
 if (lsCart == null) {
@@ -42,7 +40,6 @@ for (let i = 0; i < cart.length; i++) {
         })
         // Traitement des données productdata pour créer les balises
         .then(productdata => {
-
             // Si le panier n'est pas vide : creation des cart articles
             const section = document.getElementById("cart__items");
             const article = document.createElement("article");
@@ -93,13 +90,28 @@ for (let i = 0; i < cart.length; i++) {
             div_quantity.appendChild(p_qty)
 
             const inputQty = document.createElement('input');
-            inputQty.setAttribute('type', 'number');
-            inputQty.classList.add('itemQuantity');
+            inputQty.setAttribute("type", "number");
+            inputQty.classList.add("itemQuantity");
             inputQty.name = "itemQuantity";
             inputQty.min = 1;
             inputQty.max = 100;
             inputQty.value = qty;
             div_quantity.appendChild(inputQty);
+
+
+
+            verifInput()
+
+            function verifInput() {
+
+
+                if (inputQty.value > 100 || inputQty.value == "") {
+                    alert("Veuillez vous assurer que les quantités des articles soient toutes comprises entre 1 et 100.");
+                    return;
+                }
+
+            }
+
 
             let itemDelete = document.createElement('div');
             itemDelete.classList.add('cart__item__content__settings__delete');
@@ -109,17 +121,18 @@ for (let i = 0; i < cart.length; i++) {
             p_itemDelete.classList.add('deleteItem');
             p_itemDelete.innerHTML = 'Supprimer';
             itemDelete.appendChild(p_itemDelete);
-
             // Calcul du sous total ds articles
             let sousTotal = inputQty.value * productdata.price;
             tableauDesSSTT.push(sousTotal);
             console.log(tableauDesSSTT)
-
             // Gestion du changement de quantité dû à l'input(listen)
-            inputQty.addEventListener("input", () => {
+            inputQty.addEventListener("change", (e) => {
+                //rajout prevent defaut
+                (e).preventDefault();
                 newQty = parseInt(inputQty.value);
-                if (newQty <= 0 || newQty > 100) {
+                if (newQty == NaN || newQty == "" || newQty <= 0 || newQty > 100) {
                     alert("Veuillez sélectionner une quantité comprise entre 1 et 100");
+
                 } else {
                     // Changer le panier
                     cart[i].quantité = newQty;
@@ -135,7 +148,6 @@ for (let i = 0; i < cart.length; i++) {
                     saveCartToLocalStorage();
                 }
             });
-
             // Calcul du prix total via reducer(somme des sous totaux) et affichage par article
             const reducer = (accumulator, currentValue) => accumulator + currentValue;
             const prixTotal = tableauDesSSTT.reduce(reducer, 0);
@@ -146,11 +158,9 @@ for (let i = 0; i < cart.length; i++) {
             const sstt = document.createElement("h3")
             sstt.innerHTML = "sous total : " + inputQty.value * productdata.price + "€";
             div_quantity.appendChild(sstt);
-
             // Suppression d'article
             let deleteItem = document.querySelectorAll(".deleteItem");
             console.log(deleteItem)
-
             p_itemDelete.addEventListener("click", function () {
                 // On passe la quantité à 0 pour l'élémpent courant
                 cart[i].quantité = 0;
@@ -165,7 +175,6 @@ for (let i = 0; i < cart.length; i++) {
             calcQty();
 
         })
-
     // Calcul de la quantité globale et du prix total
     function calcQty() {
         let eltQuantity = document.getElementsByClassName('itemQuantity');
@@ -176,13 +185,11 @@ for (let i = 0; i < cart.length; i++) {
         }
         let totalQuantityItems = document.getElementById('totalQuantity');
         totalQuantityItems.innerHTML = totalQuantitySelect;
-
         // Calcul et affichage du prix total
         let totalPrice = tableauDesSSTT.reduce((acc, current) => acc + current, 0);
         document.getElementById("totalPrice").innerHTML = totalPrice;
 
     }
-
     // Modifier les quantités des articles
     function modifyQty(evt, canap, option) {
         const modifQty = evt.target;
@@ -194,10 +201,12 @@ for (let i = 0; i < cart.length; i++) {
                 cart[m].quantité = e.target.value;
 
                 if (
+                    cart[m].quantité == "" ||
                     cart[m].quantité == 0 ||
                     cart[m].quantité > 100
                 ) {
                     alert("Veuillez sélectionner une quantité comprise entre 1 et 100");
+
                 } else {
                     calcQty();
                     saveCartToLocalStorage();
@@ -213,15 +222,12 @@ for (let i = 0; i < cart.length; i++) {
     }
 
 }
-
 ///////////////////////////////////Gestion du formulaire////////////////////////////////////////////////////////////
 
-
 // Etablir les RegEx(expressions régulières) pour définir le type de caractères utilisés dans les champs et le format
-let nameRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç ,.'-]+$");
-let addressRegex = new RegExp('^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+');
-let emailRegex = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
-
+let nameRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç \.'-]+$");
+let addressRegex = new RegExp("^[-a-zA-Z0-9àâäéèêëïîôöùûüç', ]+$");
+let emailRegex = new RegExp("^[a-zA-Z0-9\.-_]+[@][a-zA-Z0-9\._-]+\.[a-z]{2,10}$");
 // Tests de validation des champs du formulaire
 let firstName = document.getElementById('firstName');
 firstName.placeholder = "John";
@@ -254,7 +260,7 @@ lastName.addEventListener('input', function (e) {
 });
 
 let address = document.getElementById('address');
-address.placeholder = "1,rue de la Paix"
+address.placeholder = "1, rue de la Paix"
 address.addEventListener('input', function (e) {
     e.preventDefault();
     if (addressRegex.test(address.value) === false) {
@@ -295,15 +301,14 @@ email.addEventListener('input', function (e) {
     }
 });
 
+////////////////////////////////////////////////////////////Optention du numéro de commande
 // Communiquer avec l'API
 const btn_commander = document.getElementById("order");
-
 // envoi des infos
 btn_commander.addEventListener("click", (e) => {
     e.preventDefault();
-
     //test de validité de la commande(panier + formulaire)
-    if (cart.length == 0) {
+    if (!cart) {
         alert(
             'Votre panier est vide. Veuillez sélectionner au moins un article pour passer une commande'
         );
@@ -320,14 +325,12 @@ btn_commander.addEventListener("click", (e) => {
         alert('Veuillez remplir correctement tous les champs du formulaire');
         return;
     }
-
     // Tableau des Id
     let productId = [];
     for (let i = 0; i < cart.length; i++) {
         productId.push(cart[i].id);
     }
     console.log(productId)
-
     // Objet à envoyer au bon format
     let order = {
         contact: {

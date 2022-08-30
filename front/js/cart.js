@@ -98,21 +98,6 @@ for (let i = 0; i < cart.length; i++) {
             inputQty.value = qty;
             div_quantity.appendChild(inputQty);
 
-
-
-            verifInput()
-
-            function verifInput() {
-
-
-                if (inputQty.value > 100 || inputQty.value == "") {
-                    alert("Veuillez vous assurer que les quantités des articles soient toutes comprises entre 1 et 100.");
-                    return;
-                }
-
-            }
-
-
             let itemDelete = document.createElement('div');
             itemDelete.classList.add('cart__item__content__settings__delete');
             div_quantity.appendChild(itemDelete);
@@ -127,10 +112,9 @@ for (let i = 0; i < cart.length; i++) {
             console.log(tableauDesSSTT)
             // Gestion du changement de quantité dû à l'input(listen)
             inputQty.addEventListener("change", (e) => {
-                //rajout prevent defaut
                 (e).preventDefault();
-                newQty = parseInt(inputQty.value);
-                if (newQty == NaN || newQty == "" || newQty <= 0 || newQty > 100) {
+                const newQty = parseInt(inputQty.value);
+                if (isNaN(newQty) || newQty <= 0 || newQty > 100) {
                     alert("Veuillez sélectionner une quantité comprise entre 1 et 100");
 
                 } else {
@@ -141,7 +125,7 @@ for (let i = 0; i < cart.length; i++) {
                     // Changer le sous-total dans le tableau des ss-totaux
                     tableauDesSSTT[i] = newQty * productdata.price;
                     // Mettre l'affichage de la quantité de l'article à jour
-                    p_qty.innerHTML = "Qté : " + inputQty.value;
+                    p_qty.innerHTML = "Qté : " + newQty;
                     // Calculer et afficher le prix total
                     calcQty();
                     // Mettre à jour le localStorage
@@ -206,7 +190,7 @@ for (let i = 0; i < cart.length; i++) {
                     cart[m].quantité > 100
                 ) {
                     alert("Veuillez sélectionner une quantité comprise entre 1 et 100");
-
+                    return;
                 } else {
                     calcQty();
                     saveCartToLocalStorage();
@@ -228,6 +212,7 @@ for (let i = 0; i < cart.length; i++) {
 let nameRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç \.'-]+$");
 let addressRegex = new RegExp("^[-a-zA-Z0-9àâäéèêëïîôöùûüç', ]+$");
 let emailRegex = new RegExp("^[a-zA-Z0-9\.-_]+[@][a-zA-Z0-9\._-]+\.[a-z]{2,10}$");
+
 // Tests de validation des champs du formulaire
 let firstName = document.getElementById('firstName');
 firstName.placeholder = "John";
@@ -301,17 +286,16 @@ email.addEventListener('input', function (e) {
     }
 });
 
-////////////////////////////////////////////////////////////Optention du numéro de commande
+/////////////////////////////////////////////////////Optention du numéro de commande//////////////////////////////////////////
 // Communiquer avec l'API
 const btn_commander = document.getElementById("order");
 // envoi des infos
 btn_commander.addEventListener("click", (e) => {
     e.preventDefault();
     //test de validité de la commande(panier + formulaire)
-    if (!cart) {
+    if (cart.length == 0) {
         alert(
-            'Votre panier est vide. Veuillez sélectionner au moins un article pour passer une commande'
-        );
+            "Votre panier est vide. Veuillez sélectionner au moins un article pour passer une commande");
         return;
     }
 
@@ -322,7 +306,8 @@ btn_commander.addEventListener("click", (e) => {
         !nameRegex.test(city.value) ||
         !addressRegex.test(address.value)
     ) {
-        alert('Veuillez remplir correctement tous les champs du formulaire');
+        alert(
+            "Veuillez remplir correctement tous les champs du formulaire");
         return;
     }
     // Tableau des Id
@@ -360,7 +345,7 @@ btn_commander.addEventListener("click", (e) => {
             const orderId = data.orderId;
             console.table(data)
             // Renvoi de l'orderId dans l'URL de confirmation.html
-            document.location.href = "confirmation.html?id=" + data.orderId;
+            document.location.href = "confirmation.html?id=" + orderId;
 
         })
         .catch(function (err) {

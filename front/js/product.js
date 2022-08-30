@@ -1,6 +1,13 @@
 // Récupération de id dans l'URL via urlParams.get
 let urlParams = new URLSearchParams(location.search);
 let urlId = urlParams.get('id');
+//  Récupérer le panier sous forme d'objet
+let lsCart = localStorage.getItem("product");
+// S"assurer que lsCart exist bien (sous forme de string)
+if (!lsCart) {
+  lsCart = '[]';
+}
+let cart = JSON.parse(lsCart);
 
 fetch('http://localhost:3000/api/products/' + urlId)
 
@@ -56,59 +63,92 @@ fetch('http://localhost:3000/api/products/' + urlId)
       // Récupérer les données de couleur et qte
       let selectedColor = document.getElementById("colors").value;
       // ATTENTION: nous voulons une valeur et pas une string
-
       let qty = parseInt(document.getElementById("quantity").value);
-      //const qtyString = document.getElementById("quantity").value;
-//let qty = parseInt(qtyString);
-      // Obliger le visiteur à choisir des quantité et couleurs valides
-      if (
-        //! qty.match("/^[0-9]*$/g") ||
-        qty == NaN ||
-        qty == "" ||
-        qty <= 0 ||
-        qty > 100 ||
-        selectedColor == null ||
-        selectedColor == ""
-      ) {
-        alert("Veuillez selectionner une couleur et une quantité comprise entre 1 et 100");
-        return;
-      };
+      // Construire l'objet sélectionné
       // Canapé choisi
-      let selection = {
+      const selection = {
         id: data._id,
         option: selectedColor,
         quantité: qty
 
       }
-      ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
 
-      let lsCart = localStorage.getItem("product");
-      // S"assurer que lsCart exist bien (sous forme de string)
-      if (!lsCart) {
-        lsCart = '[]';
+      // Je recherche l'objet sélectionné dans le panier
+      const objectInCart = findObjectInCart(selection.id, selection.option);
+      let qtyInCart;
+      // Version opérateur ternaire
+      // qtyInCart = (objectInCart === null) ? 0 : objectInCart.quantité;
+      if (objectInCart === null) {
+        qtyInCart = 0;
+      } else {
+        qtyInCart = objectInCart.quantité;
       }
-      let cart = JSON.parse(lsCart);
-      console.log(cart)
-      // Créer un drapeau "trouvé" à false
-      let foundFlag = false;
-      // Parcourir le panier => for
+
+      console.log("qtyInCart  :" + qtyInCart)
+
+
+      // Obliger le visiteur à choisir des quantiés et couleur valides
+      if (
+        isNaN(qty) ||
+        qty <= 0 ||
+        qty > 100 - qtyInCart
+
+      ) {
+        alert("Veuillez selectionner une quantité totale comprise entre 1 et 100");
+        return;
+      };
+
+      if (
+        selectedColor == null ||
+        selectedColor == ""
+
+      ) {
+        alert("Veuillez selectionner une couleur");
+        return;
+      };
+
+      ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
+      /**
+       * Fonction qui retourne l'objet sélectionné trouvé dans le panier s'il existe, null sinon.
+       * @param {*} id l'identifiant de l'objet à trouver dans le panier
+       * @param {*} option l'option (couleur) de l'objet à trouver dans le panier
+       * @returns L'objet présent dans le panier ou null
+       */
+      function findObjectInCart(id, option) {
+        // Parcourir le panier => for
+        for (let product of cart) {
+          // À chaque objet :
+          // Vérifier si l'objet correspond à la sélection
+          // Si c'est le cas (if)
+          if (product.id === id && product.option === option) {
+
+            // product.quantité += qty;
+
+            // J'ai trouvé l'objet, je le retourne
+            return product;
+          }
+          // Sinon (else) je passe à l'objet suivant
+        } // Fin de boucle
+        // Ici, on sait que le produit n'est pas dans le panier
+        return null;
+      }
+
+      // Si l'objet n'est pas déja dans le panier, on l'ajoute
+      if (objectInCart === null) {
+        cart.push(selection);
+
+      } else {
+        qtyInCart += selection.quantité;
+
+      }
+
       for (let product of cart) {
-        // À chaque objet :
-        // Vérifier si l'objet correspond à la sélection
-        // Si c'est le cas (if)
+
         if (product.id === selection.id && product.option === selection.option) {
-          // Je lève le drapeau (trouvé = true)
-          foundFlag = true;
           // Je modifie la quantité dans la panier
           product.quantité += qty;
         }
-        // Sinon (else) je passe à l'objet suivant
-      }
-      // Après la boucle je regarde le drapeau
-      // Si le drapeau n'est pas levé (false) c'est que je n'ai pas l'objet dans le panier
-      if (foundFlag == false) {
-        // => je l'ajoute
-        cart.push(selection);
+
       }
       // Dans tous les cas on remet le panier dans le storage
       localStorage.product = JSON.stringify(cart);
@@ -121,4 +161,3 @@ fetch('http://localhost:3000/api/products/' + urlId)
     console.error("intervention de catch: il y a une erreur")
 
   })
-

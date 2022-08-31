@@ -1,3 +1,17 @@
+
+
+
+import {test} from './helpers.js';
+
+test()
+
+
+import {testCalc} from './helpers.js';
+
+testCalc(4, 2)
+testCalc(3, 7)
+
+
 // Récupération de id dans l'URL via urlParams.get
 let urlParams = new URLSearchParams(location.search);
 let urlId = urlParams.get('id');
@@ -8,6 +22,10 @@ if (!lsCart) {
   lsCart = '[]';
 }
 let cart = JSON.parse(lsCart);
+
+import {saveCartToLocalStorage} from './helpers.js';
+
+
 
 fetch('http://localhost:3000/api/products/' + urlId)
 
@@ -84,7 +102,20 @@ fetch('http://localhost:3000/api/products/' + urlId)
         qtyInCart = objectInCart.quantité;
       }
 
+      //qtyInCart = 0;
+
       console.log("qtyInCart  :" + qtyInCart)
+
+
+
+      
+
+
+
+
+
+
+
 
 
       // Obliger le visiteur à choisir des quantiés et couleur valides
@@ -151,8 +182,13 @@ fetch('http://localhost:3000/api/products/' + urlId)
 
       }
       // Dans tous les cas on remet le panier dans le storage
-      localStorage.product = JSON.stringify(cart);
 
+
+     localStorage.product = JSON.stringify(cart);
+
+     //saveCartToLocalStorage()
+
+     
     })
 
   })
@@ -161,3 +197,8 @@ fetch('http://localhost:3000/api/products/' + urlId)
     console.error("intervention de catch: il y a une erreur")
 
   })
+
+
+  
+
+ 

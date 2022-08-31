@@ -7,6 +7,7 @@ let lsCart = localStorage.getItem("product");
 if (!lsCart) {
   lsCart = '[]';
 }
+
 let cart = JSON.parse(lsCart);
 
 fetch('http://localhost:3000/api/products/' + urlId)
@@ -72,7 +73,6 @@ fetch('http://localhost:3000/api/products/' + urlId)
         quantité: qty
 
       }
-
       // Je recherche l'objet sélectionné dans le panier
       const objectInCart = findObjectInCart(selection.id, selection.option);
       let qtyInCart;
@@ -83,18 +83,19 @@ fetch('http://localhost:3000/api/products/' + urlId)
       } else {
         qtyInCart = objectInCart.quantité;
       }
-
-      console.log("qtyInCart  :" + qtyInCart)
-
-
       // Obliger le visiteur à choisir des quantiés et couleur valides
       if (
         isNaN(qty) ||
-        qty <= 0 ||
-        qty > 100 - qtyInCart
-
+        qty <= 0
       ) {
-        alert("Veuillez selectionner une quantité totale comprise entre 1 et 100");
+        alert("Veuillez selectionner une quantité comprise entre 1 et 100");
+        return;
+      }
+
+      if (
+        qty > 100 - qtyInCart
+      ) {
+        alert("La quantité totale de cet article contenue dans le panier ne peut pas dépasser 100!");
         return;
       };
 
@@ -108,46 +109,13 @@ fetch('http://localhost:3000/api/products/' + urlId)
       };
 
       ///////////////////////////////////////////////////////gestion du localstorage/////////////////////////////////////////////
-      /**
-       * Fonction qui retourne l'objet sélectionné trouvé dans le panier s'il existe, null sinon.
-       * @param {*} id l'identifiant de l'objet à trouver dans le panier
-       * @param {*} option l'option (couleur) de l'objet à trouver dans le panier
-       * @returns L'objet présent dans le panier ou null
-       */
-      function findObjectInCart(id, option) {
-        // Parcourir le panier => for
-        for (let product of cart) {
-          // À chaque objet :
-          // Vérifier si l'objet correspond à la sélection
-          // Si c'est le cas (if)
-          if (product.id === id && product.option === option) {
-
-            // product.quantité += qty;
-
-            // J'ai trouvé l'objet, je le retourne
-            return product;
-          }
-          // Sinon (else) je passe à l'objet suivant
-        } // Fin de boucle
-        // Ici, on sait que le produit n'est pas dans le panier
-        return null;
-      }
 
       // Si l'objet n'est pas déja dans le panier, on l'ajoute
       if (objectInCart === null) {
         cart.push(selection);
 
       } else {
-        qtyInCart += selection.quantité;
-
-      }
-
-      for (let product of cart) {
-
-        if (product.id === selection.id && product.option === selection.option) {
-          // Je modifie la quantité dans la panier
-          product.quantité += qty;
-        }
+        objectInCart.quantité += selection.quantité;
 
       }
       // Dans tous les cas on remet le panier dans le storage
@@ -155,9 +123,33 @@ fetch('http://localhost:3000/api/products/' + urlId)
 
     })
 
+    /**
+           * Fonction qui retourne l'objet sélectionné trouvé dans le panier s'il existe, null sinon.
+           * @param {*} id l'identifiant de l'objet à trouver dans le panier
+           * @param {*} option l'option (couleur) de l'objet à trouver dans le panier
+           * @returns L'objet présent dans le panier ou null
+           */
+    function findObjectInCart(id, option) {
+      // Parcourir le panier => for
+      for (let product of cart) {
+        // À chaque objet :
+        // Vérifier si l'objet correspond à la sélection
+        // Si c'est le cas (if)
+        if (product.id === id && product.option === option) {
+          // J'ai trouvé l'objet, je le retourne
+          return product;
+        }
+        // Sinon (else) je passe à l'objet suivant
+      } // Fin de boucle
+      // Ici, on sait que le produit n'est pas dans le panier
+      return null;
+    }
+
   })
 
   .catch(function (err) {
     console.error("intervention de catch: il y a une erreur")
 
   })
+
+
